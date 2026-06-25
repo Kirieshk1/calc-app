@@ -2,77 +2,97 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Инженерный калькулятор</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f0f12; /* Глубокий черный/угольный фон */
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            user-select: none;
         }
         .calculator {
-            width: 95%;
-            max-width: 360px;
-            background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
-            padding: 15px;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            width: 100%;
+            max-width: 340px;
+            background-color: #1c1c24; /* Темно-серый контейнер */
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             box-sizing: border-box;
         }
         .display {
             width: 100%;
-            height: 60px;
-            background-color: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #000);
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            font-size: 22px;
+            height: 65px;
+            background-color: #0f0f12; /* Черный экран */
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            font-size: 24px;
             text-align: right;
-            padding: 10px;
+            padding: 12px;
             box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            outline: none;
         }
         .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
         button {
-            padding: 12px 2px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: 14px 2px;
+            font-size: 15px;
+            font-weight: 600;
             border: none;
-            border-radius: 8px;
-            background-color: #e0e0e0;
-            color: #000;
+            border-radius: 10px;
+            background-color: #2e2e3a; /* Темный цвет для обычных кнопок (цифр) */
+            color: #ffffff;
             cursor: pointer;
-            transition: opacity 0.1s ease;
+            transition: transform 0.05s ease, filter 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         button:active {
-            opacity: 0.7;
+            transform: scale(0.95);
+            filter: brightness(1.2); /* Легкое свечение при нажатии */
         }
+        /* Приглушенные темные пастельные тона */
         button.math-func {
-            background-color: #d1e4f9;
-            font-size: 13px;
+            background-color: #1e293b; /* Глубокий пастельно-синий */
+            color: #93c5fd; /* Светло-синий текст */
         }
         button.op {
-            background-color: #f9dbbd;
-        }
-        button.action {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            grid-column: span 2;
+            background-color: #3b2314; /* Глубокий пастельно-оранжевый */
+            color: #fdba74; /* Светло-оранжевый текст */
         }
         button.clear {
-            background-color: #ff8b8b;
-            color: white;
+            background-color: #3f1d1d; /* Глубокий пастельно-красный */
+            color: #fca5a5; /* Светло-красный текст */
+        }
+        /* Кнопка 0 на два столбца */
+        button.zero {
+            grid-column: span 2;
+            background-color: #2e2e3a;
+        }
+        /* Вертикальная кнопка "ОК" */
+        button.action {
+            grid-row: span 2;
+            background-color: #2563eb; /* Фирменный синий цвет */
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            height: 100%;
+        }
+        button.action:active {
+            background-color: #1d4ed8;
         }
     </style>
 </head>
@@ -81,47 +101,52 @@
 <div class="calculator">
     <input type="text" class="display" id="display" readonly placeholder="0">
     <div class="grid">
-        <!-- Системные и скобки -->
+        <!-- Ряд 1 -->
         <button class="clear" onclick="clearDisplay()">C</button>
-        <button onclick="backspace()">←</button>
+        <button class="clear" onclick="backspace()">←</button>
         <button onclick="input('(')">(</button>
         <button onclick="input(')')">)</button>
         <button class="op" onclick="input('/')">/</button>
 
-        <!-- Инженерные функции -->
+        <!-- Ряд 2 -->
         <button class="math-func" onclick="input('sin(')">sin</button>
         <button class="math-func" onclick="input('cos(')">cos</button>
         <button class="math-func" onclick="input('tan(')">tan</button>
         <button class="math-func" onclick="input('rad(')">rad</button>
         <button class="op" onclick="input('*')">*</button>
 
+        <!-- Ряд 3 -->
         <button class="math-func" onclick="input('ln(')">ln</button>
         <button class="math-func" onclick="input('lg(')">lg</button>
         <button class="math-func" onclick="input('sqrt(')">√</button>
         <button class="math-func" onclick="input('^')">xʸ</button>
         <button class="op" onclick="input('-')">-</button>
 
-        <!-- Цифры и константы -->
+        <!-- Ряд 4 -->
         <button onclick="input('7')">7</button>
         <button onclick="input('8')">8</button>
         <button onclick="input('9')">9</button>
         <button class="math-func" onclick="input('pi')">π</button>
         <button class="op" onclick="input('+')">+</button>
 
+        <!-- Ряд 5 -->
         <button onclick="input('4')">4</button>
         <button onclick="input('5')">5</button>
         <button onclick="input('6')">6</button>
         <button class="math-func" onclick="input('e')">e</button>
         <button class="math-func" onclick="input('fact(')">x!</button>
 
+        <!-- Ряд 6 -->
         <button onclick="input('1')">1</button>
         <button onclick="input('2')">2</button>
         <button onclick="input('3')">3</button>
-        <button class="action" onclick="sendToBot()">Вычислить</button>
-
-        <button onclick="input('0')">0</button>
-        <button onclick="input('.')">.</button>
         <button class="math-func" onclick="input('abs(')">|x|</button>
+        <button class="action" onclick="sendToBot()">ОК</button>
+
+        <!-- Ряд 7 -->
+        <button class="zero" onclick="input('0')">0</button>
+        <button onclick="input('.')">.</button>
+        <button class="math-func" onclick="input('deg(')">deg</button>
     </div>
 </div>
 
